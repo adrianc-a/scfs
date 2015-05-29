@@ -1,0 +1,2 @@
+.DEFAULT:
+	cd src && $(MAKE) $@
