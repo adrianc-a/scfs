@@ -66,7 +66,7 @@ static int sc_getattr(const char *path, struct stat* info) {
         info->st_mode = S_IFDIR | 0775;
         info->st_nlink = 2;
     } else if (args->length < 3){
-        info->st_mode = S_IFDIR | 0444;
+        info->st_mode = S_IFDIR | 0544;
         info->st_nlink = 1;
     } else {
         info->st_mode = S_IFREG | 0440;
