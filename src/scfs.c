@@ -210,7 +210,6 @@ static int sc_readdir(const char *path, void *buffer, fuse_fill_dir_t filler,
                     filler(buffer, track->title, NULL, 0);
                 }
             }
-            break;
         }
         arrdstry(playlists, sc_playlist_free_void);
     }
