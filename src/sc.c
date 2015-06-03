@@ -197,14 +197,7 @@ const array_t *sc_get_playlists(sc_t *sc) {
     return playlists;
 }
 
-const array_t *sc_get_tracks(sc_t *sc) {
-    char *url = sc_create_url(SC_EUSERS, SC_ETRACKS, sc->username,
-                              SC_ARG_LEN(0), 
-                              SC_DEFAULT_ARG_LIST(sc->client_id));
-
-    cJSON *root = http_get_json(url);
-    free(url);
-
+const array_t *sc_tracks_from_json(cJSON *root) {
     int len = cJSON_GetArraySize(root);
     array_t *tracks = arrnew();
 
@@ -217,8 +210,18 @@ const array_t *sc_get_tracks(sc_t *sc) {
     }
 
     cJSON_Delete(root);
-
     return tracks;
+}
+
+const array_t *sc_get_tracks(sc_t *sc) {
+    char *url = sc_create_url(SC_EUSERS, SC_ETRACKS, sc->username,
+                              SC_ARG_LEN(0), 
+                              SC_DEFAULT_ARG_LIST(sc->client_id));
+
+    cJSON *root = http_get_json(url);
+    free(url);
+
+    return sc_tracks_from_json(root);
 }
 
 void *sc_get_track_stream(sc_t *sc, sc_track_t *track) {
@@ -230,4 +233,14 @@ void *sc_get_track_stream(sc_t *sc, sc_track_t *track) {
     free(url);
     
     track->data = buffer;
+}
+
+const array_t *sc_search_tracks(sc_t *sc, char *q) {
+    char *url = sc_create_url(SC_ETRACKS, NULL, NULL, SC_ARG_LEN(2),
+            SC_ARG_LIST(sc->client_id, "q", q, "limit", "10"));
+    cJSON *root = http_get_json(url);
+
+    free(url);
+
+    return sc_tracks_from_json(root);
 }

@@ -15,5 +15,9 @@
                          sprintf(_buf, "%d", _i);                              \
                          _buf[_len] = '\0'
 
+#define STR_REPLACE_CHAR(_s, _o, _r)                                           \
+    for (size_t i = 0; i < strlen(_s); i++) {                                  \
+        if (_s[i] == _o) _s[i] = _r;                                           \
+    }
 
 #endif

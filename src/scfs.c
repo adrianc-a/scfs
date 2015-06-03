@@ -22,6 +22,7 @@
 #include <syslog.h>
 
 #include "sc.h"
+#include "utils.h"
 
 sc_track_t *current_track = NULL;
 
@@ -196,6 +197,8 @@ static int sc_readdir(const char *path, void *buffer, fuse_fill_dir_t filler,
         const array_t *playlists = sc_get_playlists(info);
         for (int i = 0; i < playlists->length; i++) {
             sc_playlist_t *playlist = (sc_playlist_t*)arrget(playlists, i);
+            // / is replaced by -
+            STR_REPLACE_CHAR(playlist->title, '/', '-');
             filler(buffer, playlist->title, NULL, 0);
         }
 

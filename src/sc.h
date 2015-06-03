@@ -34,7 +34,7 @@ void sc_free(sc_t *sc);
 
 #define SC_RTYPE ".json"
 
-#define SC_ARG_LIST(_id, ...) ((const char*[]){"client_id", _id, __VAR_ARGS__})
+#define SC_ARG_LIST(_id, ...) ((const char*[]){"client_id", _id, __VA_ARGS__})
 #define SC_DEFAULT_ARG_LIST(_id) ((const char*[]){"client_id", _id})
 #define SC_ARG_LEN(_length) (_length + 2)
 
@@ -80,5 +80,12 @@ const array_t *sc_get_tracks(sc_t *sc);
  * Get the mp3 stream for a specific track. 
  */
 void *sc_get_track_stream(sc_t *sc, sc_track_t *track);
+
+/**
+ * Search soundcloud for tracks, limit to 10 tracks
+ * q: query
+ * return: array of sc_track_t* 's
+ */
+const array_t *sc_search_tracks(sc_t *sc, char *q);
 
 #endif
