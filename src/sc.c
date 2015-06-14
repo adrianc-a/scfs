@@ -121,6 +121,7 @@ bool sc_track_equals(sc_track_t *a, sc_track_t *b) {
     if (!strcmp(a->id, b->id)) {
         return true;
     }
+
     return false;
 }
 void sc_track_free(sc_track_t *track) {
