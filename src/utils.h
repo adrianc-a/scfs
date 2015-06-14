@@ -7,6 +7,7 @@
 #define UTILS_H
 
 #include <math.h>
+#include <time.h>
 
 #define NUM_LEN(x) (floor(log10(abs(x))) + 1)
 
@@ -19,5 +20,7 @@
     for (size_t i = 0; i < strlen(_s); i++) {                                  \
         if (_s[i] == _o) _s[i] = _r;                                           \
     }
+
+time_t tm_to_epoch(struct tm *t);
 
 #endif

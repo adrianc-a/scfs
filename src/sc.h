@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include "arr.h"
 #include "buf.h"
 #include "cJSON.h"
@@ -42,6 +43,7 @@ typedef struct {
     char *id;
     char *title;
     buf_t *data; // data is initially NULL
+    time_t last_mod;
 } sc_track_t;
 
 sc_track_t *sc_track_new(char *i, char *t, buf_t *contents);
@@ -55,6 +57,7 @@ typedef struct {
     char *id;
     char *title;
     array_t *tracks; // array of track_t* 
+    time_t last_mod;
 } sc_playlist_t;
 
 sc_playlist_t *sc_playlist_new(char *i, char *t, array_t *tr);

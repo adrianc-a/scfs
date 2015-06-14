@@ -12,11 +12,12 @@ MAIN_EXECUTABLE = scfs
 TEST_EXECUTABLE = test
 
 SOURCES = arr.c \
+		  utils.c \
 		  buf.c \
 		  cJSON.c \
 		  http.c \
 		  sc.c
-HEADERS = $(SOURCES:.c=.h) utils.h
+HEADERS = $(SOURCES:.c=.h)
 OBJECTS = $(SOURCES:.c=.o)
 
 MAIN_SOURCES = $(SOURCES) scfs.c

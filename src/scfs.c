@@ -270,6 +270,7 @@ static int sc_getattr(const char *path, struct stat* info) {
             res = -ENOENT;
         } else {
             info->st_size = tmp->data->size;
+            info->st_mtime = tmp->last_mod;
             sc_track_free(tmp);
         }
     }

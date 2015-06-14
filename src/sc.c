@@ -3,6 +3,8 @@
  * Date: 2 May 2015
  */
 
+#include <time.h>
+
 #include "sc.h"
 #include "utils.h"
 #include "http.h"
@@ -54,6 +56,13 @@ static char *sc_create_url(char *endpoint, char *sub, char *id, int len,
     return ret;
 }
 
+static struct tm sc_get_time_from_str(char *time_stamp) {
+    struct tm t;
+    memset(&t, 0, sizeof(struct tm));
+    strptime(time_stamp, "%Y/%m/%d %H:%M:%S +0000", &t);
+    return t;
+}
+
 sc_t *sc_new(char *uname, char *cid) {
     sc_t *ret = malloc(sizeof(sc_t));
     ret->username = strdup(uname);
@@ -82,6 +91,7 @@ sc_track_t *sc_track_new(char *i, char *t, buf_t *contents) {
 }
 
 sc_track_t *sc_track_from_json(cJSON *json) {
+    // if we cannot stream it, don't even process it
     if (!cJSON_GetObjectItem(json, "streamable")->valueint) {
         return NULL;
     }
@@ -89,7 +99,10 @@ sc_track_t *sc_track_from_json(cJSON *json) {
     char *id;
     I_TO_A(cJSON_GetObjectItem(json, "id")->valueint, id);
     char *title = cJSON_GetObjectItem(json, "title")->valuestring;
+    char *time_stamp = cJSON_GetObjectItem(json, "last_modified")->valuestring;
+    struct tm t = sc_get_time_from_str(time_stamp);
 
+    // todo, fix this
     size_t o_size = (size_t)cJSON_GetObjectItem(json, 
             "original_content_size")->valueint;
 
@@ -100,6 +113,7 @@ sc_track_t *sc_track_from_json(cJSON *json) {
     };
 
     sc_track_t *ret = sc_track_new(id, title, &tmp);
+    ret->last_mod = tm_to_epoch(&t);
     free(id);
     return ret;
 }
@@ -109,6 +123,7 @@ void sc_track_cpy(sc_track_t *dst, sc_track_t *src) {
     dst->title = strdup(src->title);
     dst->id = strdup(src->id);
     dst->data = malloc(sizeof(buf_t));
+    dst->last_mod = src->last_mod;
     buf_cpy(dst->data, src->data);
 }
 
@@ -159,11 +174,14 @@ sc_playlist_t* sc_playlist_from_json(cJSON *json) {
     }
     char *id_buffer;
     I_TO_A(cJSON_GetObjectItem(json, "id")->valueint, id_buffer);
+    char *time_str = cJSON_GetObjectItem(json, "last_modified")->valuestring;
 
     sc_playlist_t* ret = sc_playlist_new(
             id_buffer,
             cJSON_GetObjectItem(json, "title")->valuestring,
             songs);
+    struct tm t = sc_get_time_from_str(time_str);
+    ret->last_mod = tm_to_epoch(&t);
     return ret;
 }
 
