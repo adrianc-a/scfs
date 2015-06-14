@@ -21,6 +21,4 @@
         if (_s[i] == _o) _s[i] = _r;                                           \
     }
 
-time_t tm_to_epoch(struct tm *t);
-
 #endif

@@ -113,7 +113,7 @@ sc_track_t *sc_track_from_json(cJSON *json) {
     };
 
     sc_track_t *ret = sc_track_new(id, title, &tmp);
-    ret->last_mod = tm_to_epoch(&t);
+    ret->last_mod = mktime(&t);
     free(id);
     return ret;
 }
@@ -181,7 +181,7 @@ sc_playlist_t* sc_playlist_from_json(cJSON *json) {
             cJSON_GetObjectItem(json, "title")->valuestring,
             songs);
     struct tm t = sc_get_time_from_str(time_str);
-    ret->last_mod = tm_to_epoch(&t);
+    ret->last_mod = mktime(&t);
     return ret;
 }
 
