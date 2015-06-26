@@ -63,6 +63,25 @@ static struct tm sc_get_time_from_str(char *time_stamp) {
     return t;
 }
 
+/**
+ * Unfortunately there is no reliable way to get the size of the mp3 file
+ * without actuall reading all of it :( so we must make this expensive request
+ * to get the length
+ */
+static void sc_get_tracks_sizes(sc_t *inf, array_t *tracks) {
+    for (int i = 0; i < tracks->length; i++) {
+        sc_track_t *track = arrget(tracks, i);
+        sc_get_track_stream(inf, track);
+    }
+}
+
+static void sc_get_playlists_tracks_sizes(sc_t *inf, array_t *playlists) {
+    for (int i = 0; i < playlists->length; i++) {
+        sc_playlist_t *pl = (sc_playlist_t*)arrget(playlists, i);
+        sc_get_tracks_sizes(inf, pl->tracks);
+    }
+}
+
 sc_t *sc_new(char *uname, char *cid) {
     sc_t *ret = malloc(sizeof(sc_t));
     ret->username = strdup(uname);
@@ -102,18 +121,14 @@ sc_track_t *sc_track_from_json(cJSON *json) {
     char *time_stamp = cJSON_GetObjectItem(json, "last_modified")->valuestring;
     struct tm t = sc_get_time_from_str(time_stamp);
 
-    // todo, fix this
-    size_t o_size = (size_t)cJSON_GetObjectItem(json, 
-            "original_content_size")->valueint;
+    sc_track_t *ret = sc_track_new(id, title, NULL);
 
-    buf_t tmp = {
-        .size = o_size,
-        .data = NULL,
-        .allocated = 0
-    };
+    // data is allocated even if it's passed NULL so free it up so we don't have
+    // a memory leak
+    free(ret->data);
 
-    sc_track_t *ret = sc_track_new(id, title, &tmp);
     ret->last_mod = mktime(&t);
+
     free(id);
     return ret;
 }
@@ -213,10 +228,12 @@ const array_t *sc_get_playlists(sc_t *sc) {
 
     cJSON_Delete(root);
 
+    sc_get_playlists_tracks_sizes(sc, playlists);
+
     return playlists;
 }
 
-const array_t *sc_tracks_from_json(cJSON *root) {
+array_t *sc_tracks_from_json(cJSON *root) {
     int len = cJSON_GetArraySize(root);
     array_t *tracks = arrnew();
 
@@ -239,11 +256,13 @@ const array_t *sc_get_tracks(sc_t *sc) {
 
     cJSON *root = http_get_json(url);
     free(url);
+    array_t *tracks = sc_tracks_from_json(root);
+    sc_get_tracks_sizes(sc, tracks);
 
-    return sc_tracks_from_json(root);
+    return tracks;
 }
 
-void *sc_get_track_stream(sc_t *sc, sc_track_t *track) {
+void sc_get_track_stream(sc_t *sc, sc_track_t *track) {
     char *url = sc_create_url(SC_ETRACKS, SC_ESTREAM, track->id,
                               SC_ARG_LEN(0),
                               SC_DEFAULT_ARG_LIST(sc->client_id));

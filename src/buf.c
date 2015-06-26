@@ -16,6 +16,7 @@ buf_t *buf_new() {
 }
 
 void buf_cpy(buf_t *dst, buf_t *src) {
+    if (!src) return;
     dst->data = malloc(src->allocated);
 
     dst->allocated = src->allocated;

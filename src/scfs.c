@@ -222,6 +222,7 @@ static bool sc_get_track_from_user(sc_t *info, array_t *elems, sc_track_t *ret) 
         sc_track_t *track = (sc_track_t*)arrget(tracks, i);
         if (!strcmp(track->title, arrget(elems, 2))) {
             sc_track_cpy(ret, track);
+            found = true;
             break;
         }
     }

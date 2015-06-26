@@ -82,7 +82,7 @@ const array_t *sc_get_tracks(sc_t *sc);
 /**
  * Get the mp3 stream for a specific track. 
  */
-void *sc_get_track_stream(sc_t *sc, sc_track_t *track);
+void sc_get_track_stream(sc_t *sc, sc_track_t *track);
 
 /**
  * Search soundcloud for tracks, limit to 10 tracks
